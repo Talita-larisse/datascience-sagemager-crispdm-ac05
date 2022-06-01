@@ -31,7 +31,7 @@ class MLP(nn.Module):
 
         # Sequencia de tarefas da rede
         self.mlp_stack = nn.Sequential(            
-            nn.Linear(12, 24), # primiera camada - aplicar transformação de linear. n características e 7 neurônios          
+            nn.Linear(14, 24), # primiera camada - aplicar transformação de linear. n características e 7 neurônios          
             nn.ReLU(),  # ativar saída - transformar entre 0 e x            
             nn.Linear(24, 5), # segunda camada - aplicar transformação de linear. 5 neurônios
             nn.ReLU(), # ativar saída - transformar entre 0 e x
@@ -62,10 +62,10 @@ def _get_dataset(data_dir):
     df = pd.read_csv(f'{data_dir}/{file}')
     
     X = df[['home_goal', 'away_goal',
-     'Pre_Home_Palmeiras', 'Pre_Home_Santos',
-       'Pre_Home_SaoPaulo', 'Pre_Home_Corinthians', 'Pre_Away_Palmeiras',
-       'Pre_Away_Santos', 'Pre_Away_SaoPaulo', 'Pre_Away_Corinthians',
-       'Pre_home_goal', 'Pre_away_goal']]
+    'Pre_Home_Palmeiras', 'Pre_Home_Santos',
+    'Pre_Home_SaoPaulo', 'Pre_Home_Corinthians', 'Pre_Home_Outros',
+    'Pre_Away_Palmeiras', 'Pre_Away_Santos', 'Pre_Away_SaoPaulo', 'Pre_Away_Corinthians',
+    'Pre_home_goal', 'Pre_away_goal', 'Pre_Away_Outros']]
 
 
     y = df['ALVO']

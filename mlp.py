@@ -31,7 +31,7 @@ class MLP(nn.Module):
 
         # Sequencia de tarefas da rede
         self.mlp_stack = nn.Sequential(            
-            nn.Linear(12, 24), # primiera camada - aplicar transformação de linear. n características e 7 neurônios          
+            nn.Linear(14, 24), # primiera camada - aplicar transformação de linear. n características e 7 neurônios          
             nn.ReLU(),  # ativar saída - transformar entre 0 e x            
             nn.Linear(24, 5), # segunda camada - aplicar transformação de linear. 5 neurônios
             nn.ReLU(), # ativar saída - transformar entre 0 e x
@@ -62,10 +62,10 @@ def _get_dataset(data_dir):
     df = pd.read_csv(f'{data_dir}/{file}')
     
     X = df[['home_goal', 'away_goal',
-     'Pre_Home_Palmeiras', 'Pre_Home_Santos',
-       'Pre_Home_SaoPaulo', 'Pre_Home_Corinthians', 'Pre_Away_Palmeiras',
-       'Pre_Away_Santos', 'Pre_Away_SaoPaulo', 'Pre_Away_Corinthians',
-       'Pre_home_goal', 'Pre_away_goal']]
+    'Pre_Home_Palmeiras', 'Pre_Home_Santos',
+    'Pre_Home_SaoPaulo', 'Pre_Home_Corinthians', 'Pre_Home_Outros',
+    'Pre_Away_Palmeiras', 'Pre_Away_Santos', 'Pre_Away_SaoPaulo', 'Pre_Away_Corinthians',
+    'Pre_home_goal', 'Pre_away_goal', 'Pre_Away_Outros']]
 
 
     y = df['ALVO']
@@ -165,7 +165,7 @@ def train(args):
             
             #acuracia_epoca += accuracy_score(y_batch.cpu(), pred_class.detach().cpu())
             _, y_pred_tags = torch.max(y_pred,dim=1)
-            acuracia_epoca += accuracy_score(y_batch.cpu(), y_pred)
+            acuracia_epoca += accuracy_score(y_batch.cpu(), y_pred_tags.cpu())
             
             
             #if batch_idx % args.log_interval == 0:
@@ -185,13 +185,14 @@ def test(model, validation_loader, device):
     model.eval()
     validation_loss = 0
     correct = 0
-    custo_fn = nn.BCELoss()
+    custo_fn = nn.CrossEntropyLoss()
     with torch.no_grad():
         for data, target in validation_loader:
             data, target = data.to(device), target.to(device)
             output = model(data)
-            validation_loss += custo_fn(output, target.unsqueeze(1)).item() 
-            pred_class = torch.round(output)            
+            validation_loss += custo_fn(output, target).item() 
+           
+            _, pred_class = torch.max(output,dim=1)
             correct += accuracy_score(target.cpu(), pred_class.detach().cpu())
 
     validation_loss /= len(validation_loader.dataset)
